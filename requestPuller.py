@@ -26,9 +26,11 @@ def CreateDataframe(fileCount, filePath):
     data = df.transpose()
 
     path: str = filePath
-    filename: str = f'test{fileCount}.csv'
+    filename: str = f'test{fileCount + 1}.csv'
     full_path: str = os.path.join(path, filename)
     data.to_csv(full_path, sep=',', index=False, mode='w')
+
+    print(f'file {full_path} has been created')
 
 
 def CountFile(dir_path):
@@ -40,17 +42,28 @@ def CountFile(dir_path):
 
 
 def RemoveFile(count, dirPath):
+
+    dict = {}
+
     if count >= 7:
         for path in os.listdir(dir_path):
             pathl = os.path.join(dirPath, path)
             creationTime = os.path.getctime(pathl)
-            print(creationTime, path)
 
-# def CompareCreatrionDate():
+            dict[pathl] = creationTime
+
+
+        fileToDelete = min(dict, key=dict.get)
+        print(f'file to delete: {fileToDelete}')
+        os.remove(fileToDelete)
+        print(f'{fileToDelete} has been deleted')
 
 
 dir_path = 'C:/Users/mateu/OneDrive/Pulpit/test/'
 
 count = CountFile(dir_path)
-# CreateDataframe(count, dir_path)
+
+print('current file count is: ', count)
+
+CreateDataframe(count, dir_path)
 RemoveFile(count, dir_path)
