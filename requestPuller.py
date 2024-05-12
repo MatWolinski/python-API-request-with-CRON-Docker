@@ -1,5 +1,4 @@
 import argparse
-
 import requests
 import pandas as pd
 import numpy as np
@@ -26,7 +25,6 @@ def create_data_frame(file_path):
 
     if response.status_code == 200:
         request_body = response.json()
-
         values = request_body.values()
 
         v = list(values)
@@ -87,9 +85,6 @@ def main(directory_path):
     create_data_frame(directory_path)
     remove_files(count, directory_path)
     print(f'current file count inside {directory_path} is {count}')
-
-
-dir_path1 = 'C:/Users/mateu/OneDrive/Pulpit/test/'
 
 
 if __name__ == '__main__':
