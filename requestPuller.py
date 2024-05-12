@@ -6,46 +6,52 @@ import datetime
 
 
 def create_directory(directory_path):
-    print('ok')
-    if os.path  .exists(directory_path):
-        print(f"The directory '{directory_path}' already exists.")
+    if os.path.exists(directory_path):
+        print(f"The directory '{directory_path}' already exists")
         return True
     else:
         try:
             os.makedirs(directory_path)
-            print(f"The directory '{directory_path}' has been created successfully.")
+            print(f"The directory '{directory_path}' has been created successfully")
             return True
         except OSError as e:
             print(f"Failed to create directory '{directory_path}': {e}")
             return False
 
 
-def create_data_frame(file_count, file_path):
-    a = requests.get('https://api.frankfurter.app/latest?from=pln&to=USD,GBP,EUR')
+def create_data_frame(file_path):
+    response = requests.get('https://api.frankfurter.app/latest?from=pln&to=USD,GBP,EUR')
 
-    request_body = a.json()
+    if response.status_code == 200:
+        request_body = response.json()
 
-    values = request_body.values()
+        values = request_body.values()
 
-    v = list(values)
+        v = list(values)
 
-    currency = v[-1]
-    kkeys = list(currency.keys())
-    kvalue = list(currency.values())
-    timestamp = datetime.datetime.now()
-    karray = np.array(['timestamp', v[1], kkeys[0], kkeys[1], kkeys[2]])
-    kvarray = np.array([timestamp, v[0], kvalue[0], kvalue[1], kvalue[2]])
+        timestamp = datetime.datetime.now()
 
-    df = pd.DataFrame(kvarray, karray)
+        currency = v[-1]
+        kkeys = list(currency.keys())
+        kvalue = list(currency.values())
 
-    data = df.transpose()
+        karray = np.array(['timestamp', v[1], kkeys[0], kkeys[1], kkeys[2]])
+        kvarray = np.array([timestamp, v[0], kvalue[0], kvalue[1], kvalue[2]])
 
-    path: str = file_path
-    filename: str = f'test{file_count + 1}.csv'
-    full_path: str = os.path.join(path, filename)
-    data.to_csv(full_path, sep=',', index=False, mode='w')
+        df = pd.DataFrame(kvarray, karray)
 
-    print(f'file {full_path} has been created')
+        timestamp_str = timestamp.strftime("%Y%m%d%H%M%S").replace(":", "_")
+
+        data = df.transpose()
+
+        path: str = file_path
+        filename: str = f'test{timestamp_str}.csv'
+        full_path: str = os.path.join(path, filename)
+        data.to_csv(full_path, sep=',', index=False, mode='w')
+
+        print(f'file {full_path} has been created')
+    else:
+        print(f"Failed to fetch data from API. Status code: '{response.status_code}'")
 
 
 def count_files(dir_path):
@@ -73,13 +79,16 @@ def remove_files(files_count, dir_path):
         print(f'{file_to_delete} has been deleted')
 
 
+def main(directory_path):
+    create_directory(directory_path)
+    count = count_files(directory_path)
+    create_data_frame(directory_path)
+    remove_files(count, directory_path)
+    print('current file count is: ', count)
+
+
 dir_path1 = 'C:/Users/mateu/OneDrive/Pulpit/test/'
 
 
-create_directory(dir_path1)
-
-count = count_files(dir_path1)
-print('current file count is: ', count)
-
-# create_data_frame(count, dir_path1)
-# remove_files(count, dir_path1)
+if __name__ == '__main__':
+    main(dir_path1)
