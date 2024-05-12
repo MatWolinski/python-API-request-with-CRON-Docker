@@ -5,12 +5,27 @@ import os
 import datetime
 
 
-def CreateDataframe(fileCount, filePath):
+def create_directory(directory_path):
+    print('ok')
+    if os.path  .exists(directory_path):
+        print(f"The directory '{directory_path}' already exists.")
+        return True
+    else:
+        try:
+            os.makedirs(directory_path)
+            print(f"The directory '{directory_path}' has been created successfully.")
+            return True
+        except OSError as e:
+            print(f"Failed to create directory '{directory_path}': {e}")
+            return False
+
+
+def create_data_frame(file_count, file_path):
     a = requests.get('https://api.frankfurter.app/latest?from=pln&to=USD,GBP,EUR')
 
-    request_Body = a.json()
+    request_body = a.json()
 
-    values = request_Body.values()
+    values = request_body.values()
 
     v = list(values)
 
@@ -25,45 +40,46 @@ def CreateDataframe(fileCount, filePath):
 
     data = df.transpose()
 
-    path: str = filePath
-    filename: str = f'test{fileCount + 1}.csv'
+    path: str = file_path
+    filename: str = f'test{file_count + 1}.csv'
     full_path: str = os.path.join(path, filename)
     data.to_csv(full_path, sep=',', index=False, mode='w')
 
     print(f'file {full_path} has been created')
 
 
-def CountFile(dir_path):
-    fileCounter = 0
+def count_files(dir_path):
+    file_counter = 0
     for path in os.listdir(dir_path):
         if os.path.isfile(os.path.join(dir_path, path)):
-            fileCounter += 1
-    return fileCounter
+            file_counter += 1
+    return file_counter
 
 
-def RemoveFile(count, dirPath):
+def remove_files(files_count, dir_path):
 
-    dict = {}
+    file_dict = {}
 
-    if count >= 7:
+    if files_count >= 7:
         for path in os.listdir(dir_path):
-            pathl = os.path.join(dirPath, path)
-            creationTime = os.path.getctime(pathl)
+            pathl = os.path.join(dir_path, path)
+            creation_time = os.path.getctime(pathl)
 
-            dict[pathl] = creationTime
+            file_dict[pathl] = creation_time
+
+        file_to_delete = min(file_dict, key=file_dict.get)
+        print(f'file to delete: {file_to_delete}')
+        os.remove(file_to_delete)
+        print(f'{file_to_delete} has been deleted')
 
 
-        fileToDelete = min(dict, key=dict.get)
-        print(f'file to delete: {fileToDelete}')
-        os.remove(fileToDelete)
-        print(f'{fileToDelete} has been deleted')
+dir_path1 = 'C:/Users/mateu/OneDrive/Pulpit/test/'
 
 
-dir_path = 'C:/Users/mateu/OneDrive/Pulpit/test/'
+create_directory(dir_path1)
 
-count = CountFile(dir_path)
-
+count = count_files(dir_path1)
 print('current file count is: ', count)
 
-CreateDataframe(count, dir_path)
-RemoveFile(count, dir_path)
+# create_data_frame(count, dir_path1)
+# remove_files(count, dir_path1)
