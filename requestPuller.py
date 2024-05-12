@@ -1,3 +1,5 @@
+import argparse
+
 import requests
 import pandas as pd
 import numpy as np
@@ -84,11 +86,16 @@ def main(directory_path):
     count = count_files(directory_path)
     create_data_frame(directory_path)
     remove_files(count, directory_path)
-    print('current file count is: ', count)
+    print(f'current file count inside {directory_path} is {count}')
 
 
 dir_path1 = 'C:/Users/mateu/OneDrive/Pulpit/test/'
 
 
 if __name__ == '__main__':
-    main(dir_path1)
+    parser = argparse.ArgumentParser(description='Fetch currency exchange rates and manage CSV files')
+    parser.add_argument('directory_path', help='Path to the directory to save CSV files')
+
+    args = parser.parse_args()
+
+    main(args.directory_path)
